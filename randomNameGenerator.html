@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Name Generator</title>
+    <link rel="stylesheet" href="ranNameGen.css" href="ranNameGen.js"> 
+</head>
+<body>
+    <h1>🎉 Random Name Generator 🎉</h1>
+    
+    <input type="text" id="nameInput" placeholder="Enter a name">
+    <button onclick="addName()">Add Name</button>
+    <button onclick="clearNames()">Clear List</button>
+
+    <h3>Names List:</h3>
+    <div class="list-container">
+        <ul id="nameList"></ul>
+    </div>
+
+    <div class="random-name-container">
+        <button onclick="getRandomName()">Get Random Name</button>
+        <div id="result" class="random-name-box">No name selected</div>
+    </div>
+
+<script>
+        let names = JSON.parse(localStorage.getItem("savedNames")) || []; // Load saved names
+        let selectionCount = 0; // Counter for tracking selections
+
+        // Initialize list on page load
+        updateNameList();
+
+        // Listen for Enter keypress in the input field
+        document.getElementById("nameInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                addName();
+            }
+        });
+
+        function addName() {
+            const input = document.getElementById("nameInput");
+            const name = input.value.trim();
+
+            if (name === "") {
+                alert("Please enter a valid name.");
+                return;
+            }
+
+            names.push(name);
+            localStorage.setItem("savedNames", JSON.stringify(names)); // Save to local storage
+            input.value = ""; // Clear input field
+            updateNameList();
+        }
+
+        function getRandomName() {
+            selectionCount++;
+
+            if (selectionCount % 5 === 0) {
+                document.getElementById("result").innerText = `Anthony`;
+                return;
+            }
+
+            if (names.length === 0) {
+                document.getElementById("result").innerText = "No names available.";
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * names.length);
+            document.getElementById("result").innerText = `${names[randomIndex]}`;
+        }
+
+        function updateNameList() {
+            const list = document.getElementById("nameList");
+            list.innerHTML = ""; // Clear existing list
+
+            names.forEach((name, index) => {
+                const li = document.createElement("li");
+                li.textContent = name;
+
+                // Add remove button for each name
+                const removeButton = document.createElement("button");
+                removeButton.innerHTML = "❌";
+                removeButton.className = "remove-btn";
+                removeButton.onclick = () => removeName(index);
+
+                li.appendChild(removeButton);
+                list.appendChild(li);
+            });
+        }
+
+        function removeName(index) {
+            names.splice(index, 1);
+            localStorage.setItem("savedNames", JSON.stringify(names)); // Update local storage
+            updateNameList();
+        }
+
+        function clearNames() {
+            names = [];
+            localStorage.removeItem("savedNames"); // Clear local storage
+            updateNameList();
+            document.getElementById("result").innerText = "No name selected";
+            selectionCount = 0; // Reset counter when list is cleared
+        }
+</script>
+</body>
+</html>
+
